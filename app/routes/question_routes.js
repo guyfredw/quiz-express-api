@@ -82,4 +82,22 @@ router.patch('/questions/:id', requireToken, (req, res, next) => {
     .then(() => res.sendStatus(204))
     .catch(next)
 })
+
+// DESTROY
+// DELETE /questions/:id
+
+router.delete('/questions/:id', requireToken, (req, res, next) => {
+  Question.findById(req.params.id)
+    // if the question cannot be found throw an error
+    .then(handle404)
+    .then(question => {
+      // throw an error if the user doesn't own the question
+      requireOwnership(req, question)
+      // if the user is the same as the owner continue below
+      question.deleteOne()
+    })
+    .then(() => res.sendStatus(200))
+    .catch(next)
+})
+
 module.exports = router
