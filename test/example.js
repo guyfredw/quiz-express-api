@@ -180,7 +180,7 @@ describe('Examples', () => {
 
     const fields = {
       title: 'Find out which HTTP status code is your spirit animal',
-      text: 'Take this 4 question quiz to find out!'
+      text: 'Take this 4 quiz quiz to find out!'
     }
 
     before(async function () {

@@ -3,7 +3,7 @@ const express = require('express')
 const passport = require('passport')
 
 // take in the mongoose model
-const Question = require('../models/question')
+const quiz = require('../models/quiz')
 
 // take in the custom errors
 const customErrors = require('../../lib/custom_errors')
@@ -23,60 +23,60 @@ const requireToken = passport.authenticate('bearer', {
 const router = express.Router()
 
 // CREATE
-// POST /questions
-router.post('/questions', requireToken, (req, res, next) => {
-  // assign the owner key of the question to the currently signed in user
-  req.body.question.owner = req.user.id
-  Question.create(req.body.question)
-    .then(question => {
-      // respond with the status and the new question
-      res.status(200).json({ question })
+// POST /quizzes
+router.post('/quizzes', requireToken, (req, res, next) => {
+  // assign the owner key of the quiz to the currently signed in user
+  req.body.quiz.owner = req.user.id
+  quiz.create(req.body.quiz)
+    .then(quiz => {
+      // respond with the status and the new quiz
+      res.status(200).json({ quiz })
     })
 })
 
 // INDEX
-// GET /questions
-router.get('/questions', requireToken, (req, res, next) => {
-  Question.find()
-    .then(questions => {
+// GET /quizzes
+router.get('/quizzes', requireToken, (req, res, next) => {
+  quiz.find()
+    .then(quizzes => {
       // `examples` will be an array of Mongoose documents
       // we want to convert each one to a POJO, so we use `.map` to
       // apply `.toObject` to each one
-      return questions.map(question => question.toObject())
+      return quizzes.map(quiz => quiz.toObject())
     })
-    // provide the response status and the questions object in json
-    .then(questions => res.status(200).json({ questions }))
+    // provide the response status and the quizzes object in json
+    .then(quizzes => res.status(200).json({ quizzes }))
     // catch any errors
     .catch(next)
 })
 
 // SHOW
-// GET /questions/:id
-router.get('/questions/:id', requireToken, (req, res, next) => {
+// GET /quizzes/:id
+router.get('/quizzes/:id', requireToken, (req, res, next) => {
   // req.params.id is the id set in the route
-  Question.findById(req.params.id)
-    // if the question cannot be found throw an error
+  quiz.findById(req.params.id)
+    // if the quiz cannot be found throw an error
     .then(handle404)
-    .then(question => res.status(200).json({ question }))
+    .then(quiz => res.status(200).json({ quiz }))
     // error handler
     .catch(next)
 })
 
 // UPDATE
-// PATCH /questions/:id
-router.patch('/questions/:id', requireToken, (req, res, next) => {
+// PATCH /quizzes/:id
+router.patch('/quizzes/:id', requireToken, (req, res, next) => {
   // if the client attempts to change the `owner` property by including a new
   // owner, prevent that by deleting that key/value pair
-  delete req.body.question.owner
+  delete req.body.quiz.owner
 
-  Question.findById(req.params.id)
+  quiz.findById(req.params.id)
     .then(handle404)
-    .then(question => {
+    .then(quiz => {
       // check to see if the request object's user is the same as the owner
       // if it is not it will throw an error
-      requireOwnership(req, question)
+      requireOwnership(req, quiz)
 
-      return question.updateOne(req.body.question)
+      return quiz.updateOne(req.body.quiz)
     })
     // if the request succeeds, return 204
     .then(() => res.sendStatus(204))
@@ -84,17 +84,17 @@ router.patch('/questions/:id', requireToken, (req, res, next) => {
 })
 
 // DESTROY
-// DELETE /questions/:id
+// DELETE /quizzes/:id
 
-router.delete('/questions/:id', requireToken, (req, res, next) => {
-  Question.findById(req.params.id)
-    // if the question cannot be found throw an error
+router.delete('/quizzes/:id', requireToken, (req, res, next) => {
+  quiz.findById(req.params.id)
+    // if the quiz cannot be found throw an error
     .then(handle404)
-    .then(question => {
-      // throw an error if the user doesn't own the question
-      requireOwnership(req, question)
+    .then(quiz => {
+      // throw an error if the user doesn't own the quiz
+      requireOwnership(req, quiz)
       // if the user is the same as the owner continue below
-      question.deleteOne()
+      quiz.deleteOne()
     })
     .then(() => res.sendStatus(200))
     .catch(next)
