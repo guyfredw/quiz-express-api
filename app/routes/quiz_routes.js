@@ -3,7 +3,7 @@ const express = require('express')
 const passport = require('passport')
 
 // take in the mongoose model
-const quiz = require('../models/quiz')
+const Quiz = require('../models/quiz')
 
 // take in the custom errors
 const customErrors = require('../../lib/custom_errors')
@@ -27,7 +27,7 @@ const router = express.Router()
 router.post('/quizzes', requireToken, (req, res, next) => {
   // assign the owner key of the quiz to the currently signed in user
   req.body.quiz.owner = req.user.id
-  quiz.create(req.body.quiz)
+  Quiz.create(req.body.quiz)
     .then(quiz => {
       // respond with the status and the new quiz
       res.status(200).json({ quiz })
@@ -37,7 +37,8 @@ router.post('/quizzes', requireToken, (req, res, next) => {
 // INDEX
 // GET /quizzes
 router.get('/quizzes', requireToken, (req, res, next) => {
-  quiz.find()
+  // Find the quizzes with the same owner
+  Quiz.find({ owner: req.user.id })
     .then(quizzes => {
       // `examples` will be an array of Mongoose documents
       // we want to convert each one to a POJO, so we use `.map` to
@@ -54,7 +55,7 @@ router.get('/quizzes', requireToken, (req, res, next) => {
 // GET /quizzes/:id
 router.get('/quizzes/:id', requireToken, (req, res, next) => {
   // req.params.id is the id set in the route
-  quiz.findById(req.params.id)
+  Quiz.findById(req.params.id)
     // if the quiz cannot be found throw an error
     .then(handle404)
     .then(quiz => res.status(200).json({ quiz }))
@@ -69,7 +70,7 @@ router.patch('/quizzes/:id', requireToken, (req, res, next) => {
   // owner, prevent that by deleting that key/value pair
   delete req.body.quiz.owner
 
-  quiz.findById(req.params.id)
+  Quiz.findById(req.params.id)
     .then(handle404)
     .then(quiz => {
       // check to see if the request object's user is the same as the owner
@@ -87,7 +88,7 @@ router.patch('/quizzes/:id', requireToken, (req, res, next) => {
 // DELETE /quizzes/:id
 
 router.delete('/quizzes/:id', requireToken, (req, res, next) => {
-  quiz.findById(req.params.id)
+  Quiz.findById(req.params.id)
     // if the quiz cannot be found throw an error
     .then(handle404)
     .then(quiz => {
