@@ -30,3 +30,9 @@ Building the backend was a considerably new step, that I wasn't used to before. 
 - Mongoose
 - Node.js
 - MongoDB
+
+### Unsolved Problems
+
+- Storing quizzes with multiple questions
+- Storing quizzes with different types of questions
+- Storing the multiple scores of users based on the quizzes
