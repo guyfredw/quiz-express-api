@@ -1,6 +1,6 @@
 # Quiz app Express api
 
-This repository contains the code which was used to build the api and the database for the Quiz full-stack application.
+This repository contains the code which was used to build the api and the database for the Quiz full-stack application. This app allows the users to do multiple actions concerning quizzes.
 
 ## Important Links
 
